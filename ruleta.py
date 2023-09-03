@@ -24,6 +24,11 @@ custom_color =(255,255,245,0.2)
 roulette_center_x = screen_width // 3
 roulette_center_y = screen_height //2
 
+apuestas = [
+    "Pleno", "Semipleno", "Pleno doble", "Caballo",
+    "Tercio", "Cuadro", "Docena", "Columna",
+    "Par o Impar", "Rojo o Negro", "Falta o Pasa", "Seisena"
+]
 
 # Números en la ruleta española en orden
 spanish_roulette_numbers = [
@@ -94,11 +99,34 @@ def obtener_color(numero):
         elif color == GREEN:
             return "Verde"
     return None
+
+def mostrar_apuestas():
+    font = pygame.font.Font(None, 24)
+    text_color = BLACK
+    x, y = 10, screen_height - 380
+
+    for apuesta in apuestas:
+        text = font.render(apuesta, True, text_color)
+        text_rect = text.get_rect(topleft=(x, y))
+        screen.blit(text, text_rect)
+        y += 25  # Espaciado entre cada apuesta
+
+
+
+
+
+
+
+
+
 # Función principal
+
+
 def main():
     running = True
     spinning = False
     show_result = False
+    
     spin_time = random.randint(
         5000, 10000
     )  # Tiempo de giro en milisegundos (5 segundos)
@@ -115,7 +143,6 @@ def main():
     roulette_rotation = 0  # Inicializamos la rotación de la ruleta en 0
     roulette_speed = 2  # Velocidad de rotación de la ruleta (ajustable)
     roulette_friction_coefficient = 0.99  # Coeficiente de fricción para la ruleta (ajustable)
-
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -135,7 +162,12 @@ def main():
                         spin_start_time = pygame.time.get_ticks()  # Registrar el tiempo de inicio del giro
                         show_result = False
         screen.fill(WHITE)
-
+ 
+        # Dibuja el título "Apuestas" en la parte superior de la lista de apuestas
+        font = pygame.font.Font(None, 36)
+        title_text = font.render("Apuestas", True, BLACK)
+        title_rect = title_text.get_rect(midtop=(screen_width // 20, 450))
+        screen.blit(title_text, title_rect)
         # Actualiza la rotación de la ruleta solo cuando está girando
         if spinning:
             roulette_speed *= roulette_friction_coefficient  # Aplicar fricción a la ruleta
@@ -152,7 +184,8 @@ def main():
 
         # Dibuja la ruleta girando en sentido contrario a la bola
         draw_roulette(ball_angle, -roulette_rotation)
-
+        mostrar_apuestas()
+        
         if spinning:
             current_rotation += ball_speed
 
