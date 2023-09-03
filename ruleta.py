@@ -37,7 +37,11 @@ spanish_roulette_numbers = [
     14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26,
 ]
 
-
+spanish_roulette_numbers_order = [
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+    13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
+    24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36
+]
 
 # Colores correspondientes a cada número (rojo o negro)
 number_colors = [
@@ -45,7 +49,34 @@ number_colors = [
     RED, BLACK, RED, BLACK, RED, BLACK, RED, BLACK, RED, BLACK, RED, BLACK,
     RED, BLACK, RED, BLACK, RED, BLACK, RED, BLACK, RED, BLACK, RED, BLACK, RED
 ]
+number_color_map_table = {
+    0: "GREEN", 1: "RED", 2: "BLACK", 3: "RED", 4: "BLACK", 5: "RED", 6: "BLACK",
+    7: "RED", 8: "BLACK", 9: "RED", 10: "BLACK", 11: "RED", 12: "RED", 13: "BLACK",
+    14: "RED", 15: "BLACK", 16: "RED", 17: "BLACK", 18: "RED", 19: "RED", 20: "BLACK",
+    21: "RED", 22: "BLACK", 23: "RED", 24: "BLACK", 25: "RED", 26: "BLACK", 27: "RED",
+    28: "BLACK", 29: "BLACK", 30: "RED", 31: "BLACK", 32: "RED", 33: "BLACK", 34: "RED",
+    35: "BLACK", 36: "RED"
+}
+def draw_number_table():
+    font = pygame.font.Font(None, 36)
+    x, y = screen_width // 1.5, 50  # Posición inicial para la tabla de números
+    row = 0
+    cell_width, cell_height = 60, 60  # Tamaño de cada cuadro
 
+    for i, number in enumerate(spanish_roulette_numbers_order):
+        color = number_color_map[number]
+        text_color = WHITE if color == BLACK else BLACK  # Color del texto para mayor visibilidad
+        number_text = font.render(str(number), True, text_color)
+        number_rect = number_text.get_rect(topleft=(x + 5, y + 5))  # Ajusta el texto dentro del cuadro
+        pygame.draw.rect(screen, color, (x, y, cell_width, cell_height))  # Dibuja el cuadro con color
+        screen.blit(number_text, number_rect)
+
+        # Mover a la siguiente fila después de cada 3 números
+        if (i + 1) % 3 == 0:
+            x = screen_width // 1.5
+            y += cell_height  # Espaciado vertical entre las filas
+        else:
+            x += cell_width  # Espaciado horizontal entre los números
 
 
 # Función para dibujar la ruleta y hacerla girar en sentido contrario a la bola
@@ -88,6 +119,15 @@ number_color_map = {
     28: BLACK, 12: RED, 35: BLACK, 3: RED, 26: BLACK
 }
 
+number_color_map_table = {
+    0: "GREEN", 1: "RED", 2: "BLACK", 3: "RED", 4: "BLACK", 5: "RED", 6: "BLACK",
+    7: "RED", 8: "BLACK", 9: "RED", 10: "BLACK", 11: "RED", 12: "RED", 13: "BLACK",
+    14: "RED", 15: "BLACK", 16: "RED", 17: "BLACK", 18: "RED", 19: "RED", 20: "BLACK",
+    21: "RED", 22: "BLACK", 23: "RED", 24: "BLACK", 25: "RED", 26: "BLACK", 27: "RED",
+    28: "BLACK", 29: "BLACK", 30: "RED", 31: "BLACK", 32: "RED", 33: "BLACK", 34: "RED",
+    35: "BLACK", 36: "RED"
+}
+
 # Función para obtener el color de un número
 def obtener_color(numero):
     if numero in number_color_map:
@@ -112,10 +152,10 @@ def mostrar_apuestas():
         y += 25  # Espaciado entre cada apuesta
 
 
+#Organizar los números en tres columnas
 
 
-
-
+# Función para dibujar la grilla con los números de la ruleta
 
 
 
@@ -185,7 +225,8 @@ def main():
         # Dibuja la ruleta girando en sentido contrario a la bola
         draw_roulette(ball_angle, -roulette_rotation)
         mostrar_apuestas()
-        
+        draw_number_table()
+
         if spinning:
             current_rotation += ball_speed
 
