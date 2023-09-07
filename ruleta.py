@@ -112,6 +112,8 @@ def draw_roulette(roulette_rotation):
 
         # Dibuja un triángulo desde el borde exterior hacia el centro
         pygame.draw.polygon(screen, color, [(x1, y1), (x2, y2), (x3, y3)])
+        pygame.draw.line(screen, (105, 62, 40), (x1, y1), (x2, y2), 4)
+        pygame.draw.line(screen, (105, 62, 40), (x1, y1), (x3, y3), 4)
 
     # Dibuja los números en la posición nueva, ligeramente ajustados y rotados hacia el centro
     for i, number in enumerate(spanish_roulette_numbers):
@@ -147,20 +149,38 @@ def draw_roulette(roulette_rotation):
 
     # Dibuja el círculo en la superficie
     pygame.draw.circle(surface, (0, 0, 0, 50), (roulette_center_x, roulette_center_y), 200)
-    pygame.draw.circle(screen, (118, 67, 25), (roulette_center_x, roulette_center_y), 200, 3)
+    pygame.draw.circle(screen, (143, 84, 54), (roulette_center_x, roulette_center_y), 200, 6)
 
     # Dibuja el centro de la ruleta
     pygame.draw.circle(surface, (170, 96, 36), (roulette_center_x, roulette_center_y), 148)
+    
+
+    # Dibuja el mango central de la ruleta
+
+    num_lines = 8
+    radius = 142
+
+    for i in range(num_lines):
+        angle = math.radians(i * (360 / num_lines))
+        x1 = roulette_center_x
+        y1 = roulette_center_y
+        x2 = int(roulette_center_x + radius * math.cos(angle))
+        y2 = int(roulette_center_y + radius * math.sin(angle))
+        pygame.draw.line(surface, (130, 83, 53), (x1, y1), (x2, y2), 5)
+
     pygame.draw.circle(screen,  (143, 80, 28), (roulette_center_x, roulette_center_y), 150, 3)
     pygame.draw.circle(surface, (145, 85, 28), (roulette_center_x, roulette_center_y), 148, 7)
     pygame.draw.circle(surface, (155, 88, 33), (roulette_center_x, roulette_center_y), 145, 3)
     pygame.draw.circle(surface, (130, 83, 53), (roulette_center_x, roulette_center_y), 143, 2)
+    
+    pygame.draw.circle(surface, (208, 117, 44), (roulette_center_x, roulette_center_y), 60)
+    
 
     # Pega la superficie en la pantalla
     screen.blit(surface, (0, 0))
 
     # Dibuja el círculo exterior que representa el borde de la ruleta
-    pygame.draw.circle(screen, BLACK, (roulette_center_x, roulette_center_y), circle_radius, 2)
+    pygame.draw.circle(screen, (71, 43, 30), (roulette_center_x, roulette_center_y), circle_radius, 2)
 
     # Dibuja el botón de girar como texto
     start_button = font.render("Girar", True, GREEN)
@@ -306,7 +326,9 @@ def main():
         ball_y = ball_center_y + int(
             165 * math.sin(math.radians(ball_angle))
         )  # Aumentamos la separación a 250
-        pygame.draw.circle(screen, (236, 231, 227), (ball_x, ball_y), ball_radius)
+        pygame.draw.circle(screen, (215, 215, 210), (ball_x, ball_y), ball_radius)
+        pygame.draw.circle(screen, (228, 225, 220), (ball_x, ball_y), ball_radius - 2)
+        pygame.draw.circle(screen, (236, 231, 227), (ball_x, ball_y), ball_radius - 6)
         if not spinning and show_result:
                 result_color = obtener_color(closest_number)
                 font = pygame.font.Font(None, 36)
