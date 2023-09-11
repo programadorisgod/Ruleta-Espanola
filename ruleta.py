@@ -6,19 +6,19 @@ import math
 pygame.init()
 
 # Configuración de la pantalla
-screen_width = 1280
+screen_width  = 1280
 screen_height = 720
 screen = pygame.display.set_mode((screen_width, screen_height), pygame.WINDOWPOS_CENTERED)
 background_image = pygame.image.load('background.png')
-shadow_image = pygame.image.load('fondo-ruleta.png')
+shadow_image     = pygame.image.load('fondo-ruleta.png')
 pygame.display.set_caption("Simulación Ruleta Española MYS")
 
 
 # Colores
-BLACK = (28, 28, 20)
-RED = (234, 38, 8)
+BLACK = ( 28,  28, 20)
+RED   = (234,  38, 8)
 WHITE = (255, 255, 255)
-GREEN = (31, 227, 2)
+GREEN = ( 31, 227, 2)
 
 
 roulette_center_x = screen_width // 3
@@ -52,8 +52,9 @@ number_color_map = {
     28: BLACK, 12: RED, 35: BLACK, 3:  RED, 26: BLACK
 }
 
+ubicaciones_tabla = []
 
-# Función para dibujar botones para cada número en la ruleta
+# Función para dibujar la tabla de apuestas de la ruleta
 def draw_number_buttons():
     font = pygame.font.Font(None, 36)
     x, y = screen_width // 1.5, 90  # Posición inicial para los botones
@@ -77,12 +78,15 @@ def draw_number_buttons():
         number_rect = number_text.get_rect(center=(x + cell_width // 2, y + cell_height // 2))
         screen.blit(number_text, number_rect)
 
+        ubicaciones_tabla.append({'pos': (x, y + 2),'rect': pygame.Rect(x, y, cell_width, cell_height)})
+
         # Mover a la siguiente fila después de cada 3 números
         if (i) % 3 == 0:
             x = screen_width // 1.5
             y += cell_height
         else:
             x += cell_width
+
 
     
     # Dibujar el triángulo para el cero
@@ -95,6 +99,8 @@ def draw_number_buttons():
     zero_text = font.render('0', True, WHITE)
     zero_rect = zero_text.get_rect(center=(942, 67.5))
     screen.blit(zero_text, zero_rect)
+
+    ubicaciones_tabla.append({'pos': (912, 47.5), 'rect': pygame.Rect(853, 32, 180, 56)})
 
     # Dibujar las casillas de apuesta
     pygame.draw.line(screen, (206, 211, 208), (851, 88), (791, 88), 2)
@@ -121,9 +127,35 @@ def draw_number_buttons():
     zero_text = font.render('19 a 36', True, WHITE)
     rotated_text = pygame.transform.rotate(zero_text, -90)
     screen.blit(rotated_text, rotated_text.get_rect(center=(820, 562)))
-    
+
+    ubicaciones_tabla.append({'pos': (790, 140), 'rect': pygame.Rect(793,  90,  58, 133)})
+    ubicaciones_tabla.append({'pos': (790, 274), 'rect': pygame.Rect(793, 225,  58, 133)})
+    ubicaciones_tabla.append({'pos': (790, 408), 'rect': pygame.Rect(793, 360,  58, 133)})
+    ubicaciones_tabla.append({'pos': (790, 543), 'rect': pygame.Rect(793, 495,  58, 135)})
 
 
+# Clase para representar una ficha
+class Ficha():
+    def __init__(self, image, x, y):
+        self.image = pygame.image.load(image)
+        self.rect = self.image.get_rect()
+        self.rect.center = (x, y)
+        self.resaltada = False 
+        self.apuesta = False
+        self.coordenadas = (x, y)
+
+# Funcion para dibujar las fichas de apostar
+def cargar_fichas(a, b, c, d):
+    fichas = []
+    for i in range(1, a + 1):
+        fichas.append(Ficha("ficha rojo carmesi.png", 1055, 115.5))
+    for i in range(1, b + 1):
+        fichas.append(Ficha("ficha azul oscuro.png", 1055, 255.5))
+    for i in range(1, c + 1):
+        fichas.append(Ficha("ficha purpura.png", 1055, 380.5))
+    for i in range(1, d + 1):
+        fichas.append(Ficha("ficha azul.png", 1055, 515.5))
+    return fichas
 
 # Función para dibujar la ruleta y hacerla girar en sentido contrario a la bola
 def draw_roulette(roulette_rotation):
@@ -228,6 +260,8 @@ def main():
     spin_time = random.randint(7500, 8500)  # Tiempo de giro en milisegundos (5 segundos)
     current_rotation = 0
 
+    fichas = cargar_fichas(5, 5, 5, 5)
+
     ball_radius = 15
     ball_center_x = roulette_center_x
     ball_center_y = roulette_center_y
@@ -238,6 +272,7 @@ def main():
     roulette_rotation = 0  # Inicializamos la rotación de la ruleta en 0
     roulette_speed = 8  # Velocidad de rotación de la ruleta (ajustable)
     roulette_friction_coefficient = 0.98  # Coeficiente de fricción para la ruleta (ajustable)
+
     while running:
         # Dibuja la ruleta girando en sentido contrario a la bola
         draw_roulette( -roulette_rotation)
@@ -253,19 +288,40 @@ def main():
 
                     # Coordenadas del punto de clic
                     click_x, click_y = event.pos
-
                     # Calcula la distancia desde el punto de clic al centro de la ruleta
                     distance = math.sqrt((click_x - roulette_center_x) ** 2 + (click_y - roulette_center_y) ** 2)
 
+                    if not spinning:
+                        for ficha in reversed(fichas):
+                            if ficha.rect.collidepoint(event.pos):
+                                if ficha.apuesta == True:
+                                    seleccionada = False
+                                    for fich in fichas:
+                                        if fich.resaltada: seleccionada = True
 
-                    # Verifica si el jugador hizo clic en un número
-                    for i, number in enumerate(spanish_roulette_numbers_order):
-                        x, y = screen_width // 1.5, 50
-                        cell_width, cell_height = 60, 60
-                        rect = pygame.Rect(x, y, cell_width, cell_height)
-                        if rect.collidepoint(event.pos):
-                            # Establece la apuesta seleccionada al número
-                            apuesta_seleccionada = number
+                                    if not seleccionada: 
+                                        ficha.apuesta = False
+                                    break
+                                else:
+                                    for fich in fichas:
+                                        if ficha != fich: fich.resaltada = False
+                                    # Cambia el estado de resaltado de la ficha
+                                    ficha.resaltada = not ficha.resaltada
+                                    break
+
+                        for i, ficha in enumerate(fichas):    
+                            if ficha.resaltada:
+                                for ubicacion in ubicaciones_tabla:
+                                    if ubicacion['rect'].collidepoint(event.pos):
+                                        # Colocar la ficha en la casilla
+                                        ficha.resaltada = False
+                                        ficha.apuesta = True
+                                        ficha.rect.x = ubicacion['pos'][0] + i
+                                        ficha.rect.y = ubicacion['pos'][1]
+                                        ficha.rect.width = 40
+                                        ficha.rect.height = 41
+                                        break
+
 
                     if distance >= 200 and distance <= 265 and not spinning:
                         # Comienza a girar la ruleta
@@ -276,6 +332,20 @@ def main():
                         spin_start_time = pygame.time.get_ticks()  # Registrar el tiempo de inicio del giro
                         show_result = False
 
+        for ficha in fichas:
+            if ficha.resaltada:
+                # Mueve ligeramente la ficha si está resaltada
+                ficha.rect.x = 1070
+                screen.blit(ficha.image, ficha.rect)
+            else:
+                if not ficha.apuesta:
+                    ficha.rect.width = 90
+                    ficha.rect.height = 100
+                    ficha.rect.x, ficha.rect.y = ficha.coordenadas
+                    screen.blit(ficha.image, ficha.rect)
+                else:
+                    screen.blit(pygame.transform.scale(ficha.image, (40, 41)), ficha.rect)
+                
  
         # Actualiza la rotación de la ruleta solo cuando está girando
         if spinning:
