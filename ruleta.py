@@ -144,7 +144,7 @@ def draw_number_buttons():
         number_rect = number_text.get_rect(center=(x + cell_width // 2, y + cell_height // 2))
         screen.blit(number_text, number_rect)
 
-        ubicaciones_tabla.append({'pos': (x, y + 2),'rect': pygame.Rect(x, y, cell_width, cell_height)})
+        ubicaciones_tabla.append({'pos': (x, y + 6),'rect': pygame.Rect(x, y, cell_width, cell_height)})
 
         # Mover a la siguiente fila después de cada 3 números
         if (i) % 3 == 0:
@@ -166,7 +166,7 @@ def draw_number_buttons():
     zero_rect = zero_text.get_rect(center=(942, 67.5))
     screen.blit(zero_text, zero_rect)
 
-    ubicaciones_tabla.append({'pos': (912, 47.5), 'rect': pygame.Rect(853, 32, 180, 56)})
+    ubicaciones_tabla.append({'pos': (912, 51.5), 'rect': pygame.Rect(853, 32, 180, 56)})
 
     # Dibujar las casillas de apuesta
     pygame.draw.line(screen, WHITED, (851, 88), (791, 88), 2)
@@ -194,10 +194,10 @@ def draw_number_buttons():
     rotated_text = pygame.transform.rotate(zero_text, -90)
     screen.blit(rotated_text, rotated_text.get_rect(center=(820, 562)))
 
-    ubicaciones_tabla.append({'pos': (790, 140), 'rect': pygame.Rect(793,  90,  58, 133)})
-    ubicaciones_tabla.append({'pos': (790, 274), 'rect': pygame.Rect(793, 225,  58, 133)})
-    ubicaciones_tabla.append({'pos': (790, 408), 'rect': pygame.Rect(793, 360,  58, 133)})
-    ubicaciones_tabla.append({'pos': (790, 543), 'rect': pygame.Rect(793, 495,  58, 135)})
+    ubicaciones_tabla.append({'pos': (791, 144), 'rect': pygame.Rect(793,  90,  58, 133)})
+    ubicaciones_tabla.append({'pos': (791, 278), 'rect': pygame.Rect(793, 225,  58, 133)})
+    ubicaciones_tabla.append({'pos': (791, 412), 'rect': pygame.Rect(793, 360,  58, 133)})
+    ubicaciones_tabla.append({'pos': (791, 547), 'rect': pygame.Rect(793, 495,  58, 135)})
 
 
 
@@ -212,8 +212,8 @@ def draw_number_buttons():
     zero_text = font.render('Impar', True, WHITE)
     screen.blit(zero_text, zero_text.get_rect(center=(988, 656)))
 
-    ubicaciones_tabla.append({'pos': (865, 635), 'rect': pygame.Rect(853, 632,  88, 44)})
-    ubicaciones_tabla.append({'pos': (955, 635), 'rect': pygame.Rect(943, 632,  90, 44)})
+    ubicaciones_tabla.append({'pos': (865, 639), 'rect': pygame.Rect(853, 632,  88, 44)})
+    ubicaciones_tabla.append({'pos': (955, 639), 'rect': pygame.Rect(943, 632,  90, 44)})
 
 
 # Clase para representar una ficha
@@ -392,6 +392,7 @@ def main():
     running = True
     spinning = False
     show_result = False
+    show_profits = False
     
     current_rotation = 0
 
@@ -399,7 +400,7 @@ def main():
 
     ball_center_x = roulette_center_x
     ball_center_y = roulette_center_y
-    ball_angle = 0
+    ball_angle = random.randint(0, 360)
     ball_speed = 0  # Inicializamos la velocidad de la bola en 0
     friction_coefficient = 0.98  # Coeficiente de fricción para la bola (ajustable)
 
@@ -408,6 +409,10 @@ def main():
     roulette_friction_coefficient = 0.98  # Coeficiente de fricción para la ruleta (ajustable)
 
     amount = show_start_layer()
+
+    result_color = ""
+    apuestas_resultados = {}
+    fichas_count = []
 
     while running:
         # Dibuja la ruleta girando en sentido contrario a la bola
@@ -482,10 +487,11 @@ def main():
                                         # Colocar la ficha en la casilla
                                         ficha.resaltada = False
                                         ficha.apuesta = True
-                                        ficha.rect.x = ubicacion['pos'][0] + i
+                                        if i != 0: ficha.rect.x = ubicacion['pos'][0] + ((30 / (len(fichas))) * i)
+                                        else: ficha.rect.x = ubicacion['pos'][0]
                                         ficha.rect.y = ubicacion['pos'][1]
-                                        ficha.rect.width = 40
-                                        ficha.rect.height = 41
+                                        ficha.rect.width = 30
+                                        ficha.rect.height = 31
                                         break
 
 
@@ -496,6 +502,7 @@ def main():
                         ball_speed = random.randint(9, 40)  # Calcula la velocidad necesaria para girar en 5 segundos
                         roulette_speed = random.randint(8, 35)  # Restablece la velocidad de la ruleta
                         show_result = False
+                        show_profits = False
 
         for ficha in fichas:
             if ficha.resaltada:
@@ -509,7 +516,7 @@ def main():
                     ficha.rect.x, ficha.rect.y = ficha.coordenadas
                     screen.blit(ficha.image, ficha.rect)
                 else:
-                    screen.blit(pygame.transform.scale(ficha.image, (40, 41)), ficha.rect)
+                    screen.blit(pygame.transform.scale(ficha.image, (30, 31)), ficha.rect)
 
         # Contar fichas no apostadas y crear textos
         fichas_rojas_act = sum(1 for ficha in fichas if not ficha.apuesta and ficha.image_name == "ficha rojo carmesi.png")
@@ -558,6 +565,7 @@ def main():
 
             if (ball_speed < 0.3):
                 show_result = True
+                show_profits = True
                 spinning = False
                 ball_speed = 0  # Detener la esfera al instante al final del giro
             else:
@@ -611,29 +619,56 @@ def main():
         pygame.draw.circle(screen, (236, 231, 227), (ball_x, ball_y), 9)
 
 
-        if not spinning and show_result:
-            result_color = obtener_color(closest_number)
-            apuestas_resultados = verificar_apuestas_y_calcular_ganancias(fichas, closest_number, result_color)
-            fichas_count = [0,0,0,0]
+        if not spinning and show_profits:
+            
+            if show_result:
+                result_color = obtener_color(closest_number)
+                apuestas_resultados = verificar_apuestas_y_calcular_ganancias(fichas, closest_number, result_color)
+                fichas_count = [0,0,0,0]
                 
-            for ficha in fichas:
-                if ficha.image_name == "ficha rojo carmesi.png":
-                    fichas_count[0] += 1
-                elif ficha.image_name == "ficha azul oscuro.png":
-                    fichas_count[1] += 1
-                elif ficha.image_name == "ficha purpura.png":
-                    fichas_count[2] += 1
-                else:
-                    fichas_count[3] += 1
+                for ficha in fichas:
+                    if ficha.image_name == "ficha rojo carmesi.png":
+                        fichas_count[0] += 1
+                    elif ficha.image_name == "ficha azul oscuro.png":
+                        fichas_count[1] += 1
+                    elif ficha.image_name == "ficha purpura.png":
+                        fichas_count[2] += 1
+                    else:
+                        fichas_count[3] += 1
+            
+            # Mostrar ganancias y perdidas
+            text_rojo_carmesi = font.render(f' {apuestas_resultados["ficha rojo carmesi.png"]}', True, WHITED)
+            if apuestas_resultados["ficha rojo carmesi.png"] > -1:
+                text_rojo_carmesi = font.render(f'+{apuestas_resultados["ficha rojo carmesi.png"]}', True, WHITED)
+            
+            text_azul_oscuro = font.render(f' {apuestas_resultados["ficha azul oscuro.png"]}', True, WHITED)
+            if apuestas_resultados["ficha azul oscuro.png"] > -1:
+                text_azul_oscuro = font.render(f'+{apuestas_resultados["ficha azul oscuro.png"]}', True, WHITED)
 
-            fichas_count[0] += apuestas_resultados["ficha rojo carmesi.png"]
-            fichas_count[1] += apuestas_resultados["ficha azul oscuro.png"]
-            fichas_count[2] += apuestas_resultados["ficha purpura.png"]
-            fichas_count[3] += apuestas_resultados["ficha azul.png"]
+            text_purpura = font.render(f' {apuestas_resultados["ficha purpura.png"]}', True, WHITED)
+            if apuestas_resultados["ficha purpura.png"] > -1:
+                text_purpura = font.render(f'+{apuestas_resultados["ficha purpura.png"]}', True, WHITED)
+            
+            text_azul = font.render(f' {apuestas_resultados["ficha azul.png"]}', True, WHITED)
+            if apuestas_resultados["ficha azul.png"] > -1:
+                text_azul = font.render(f'+{apuestas_resultados["ficha azul.png"]}', True, WHITED)
+            
 
-            fichas = cargar_fichas(fichas_count[0], fichas_count[1], fichas_count[2], fichas_count[3])
-            print(closest_number, result_color)
-            show_result = False
+            screen.blit(text_rojo_carmesi, (230,  20))
+            screen.blit(text_azul_oscuro,  (230,  50))
+            screen.blit(text_purpura,      (230,  80))
+            screen.blit(text_azul,         (230, 110))
+
+            if show_result:
+                fichas_count[0] += apuestas_resultados["ficha rojo carmesi.png"]
+                fichas_count[1] += apuestas_resultados["ficha azul oscuro.png"]
+                fichas_count[2] += apuestas_resultados["ficha purpura.png"]
+                fichas_count[3] += apuestas_resultados["ficha azul.png"]
+
+                # Reflejarlas en las fichas
+                fichas = cargar_fichas(fichas_count[0], fichas_count[1], fichas_count[2], fichas_count[3])
+                print(closest_number, result_color)
+                show_result = False
 
         pygame.display.flip()
 
