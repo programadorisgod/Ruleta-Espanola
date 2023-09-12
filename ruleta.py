@@ -393,8 +393,6 @@ def main():
     spinning = False
     show_result = False
     show_profits = False
-    
-    current_rotation = 0
 
     fichas = cargar_fichas(5, 5, 5, 5)
 
@@ -558,10 +556,6 @@ def main():
 
 
         if spinning:
-            current_rotation += ball_speed
-
-            if current_rotation >= 360:
-                current_rotation -= 360
 
             if (ball_speed < 0.3):
                 show_result = True
