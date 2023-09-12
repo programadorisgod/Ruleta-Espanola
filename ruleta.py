@@ -18,6 +18,7 @@ pygame.display.set_caption("Simulación Ruleta Española MYS")
 BLACK = ( 28,  28, 20)
 RED   = (234,  38, 8)
 WHITE = (255, 255, 255)
+WHITED = (206, 211, 208)
 GREEN = ( 31, 227, 2)
 
 
@@ -53,6 +54,71 @@ number_color_map = {
 }
 
 ubicaciones_tabla = []
+money_per_ficha = 0
+
+# Crear función para mostrar la capa de inicio
+def show_start_layer():
+    running = True
+    amount = 0
+
+    background = pygame.image.load('fondo_inicio.png')
+
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                # Verificar si se hizo clic en el botón "Modo Estándar"
+                if 177 <= event.pos[0] <= 570 and 311 <= event.pos[1] <= 410:
+                    amount = 10000
+                    running = False
+                # Verificar si se hizo clic en el botón "Modo Premium"
+                elif 711 <= event.pos[0] <= 1104 and 311 <= event.pos[1] <= 410:
+                    amount = 50000
+                    running = False
+
+        screen.blit(background, (0, 0))
+
+
+        pygame.display.flip()
+    
+    return amount
+
+
+# Función para dibujar la tabla de dinero por color
+def draw_money_table(fichas, amount):
+    font = pygame.font.Font(None, 36)
+    money_per_ficha = amount
+
+    # Calcula el dinero total para cada tipo de ficha
+    dinero_rojo_carmesi = sum(1 for ficha in fichas if ficha.image_name == "ficha rojo carmesi.png") * money_per_ficha
+    dinero_azul_oscuro = sum(1 for ficha in fichas if ficha.image_name == "ficha azul oscuro.png") * money_per_ficha
+    dinero_purpura = sum(1 for ficha in fichas if ficha.image_name == "ficha purpura.png") * money_per_ficha
+    dinero_azul = sum(1 for ficha in fichas if ficha.image_name == "ficha azul.png") * money_per_ficha
+
+    pygame.draw.line(screen, WHITED, (10, 10), (220, 10), 3)  # Línea superior
+    pygame.draw.line(screen, WHITED, (10, 10), (10, 143), 3)  # Línea izquierda
+    pygame.draw.line(screen, WHITED, (220, 10), (220, 143), 3)  # Línea derecha
+    pygame.draw.line(screen, WHITED, (10, 143), (220, 143), 3)  # Línea inferior
+    pygame.draw.line(screen, WHITED, (55, 10), (55, 143), 3) # Línea interna
+
+    # Dibuja cuadros de colores para representar los tipos de ficha
+    pygame.draw.rect(screen, (152, 30,  55), (20,  20, 25, 25))  # Rojo Carmesí
+    pygame.draw.rect(screen, (30,  78, 152), (20,  50, 25, 25))  # Azul Oscuro
+    pygame.draw.rect(screen, (99,  29, 151), (20,  80, 25, 25))  # Purpura
+    pygame.draw.rect(screen, (0,  186, 237), (20, 110, 25, 25))  # Azul
+
+    text_rojo_carmesi = font.render(f'${dinero_rojo_carmesi}', True, WHITED)
+    text_azul_oscuro  = font.render(f'${dinero_azul_oscuro}', True, WHITED)
+    text_purpura      = font.render(f'${dinero_purpura}', True, WHITED)
+    text_azul         = font.render(f'${dinero_azul}', True, WHITED)
+
+    screen.blit(text_rojo_carmesi, (70,  20))
+    screen.blit(text_azul_oscuro,  (70,  50))
+    screen.blit(text_purpura,      (70,  80))
+    screen.blit(text_azul,         (70, 110))
+
+
 
 # Función para dibujar la tabla de apuestas de la ruleta
 def draw_number_buttons():
@@ -69,7 +135,7 @@ def draw_number_buttons():
 
         # Dibujar el borde alrededor de la casilla
         border_rect = pygame.Rect(x - border_width, y - border_width, cell_width + 2 * border_width, cell_height + 2 * border_width)
-        pygame.draw.rect(screen, (206, 211, 208), border_rect)
+        pygame.draw.rect(screen, WHITED, border_rect)
 
         # Dibujar la casilla de apuesta
         pygame.draw.rect(screen, color, (x, y, cell_width, cell_height))
@@ -90,11 +156,11 @@ def draw_number_buttons():
 
     
     # Dibujar el triángulo para el cero
-    pygame.draw.line(screen, (206, 211, 208), (851, 75), (942, 30), 3)
-    pygame.draw.line(screen, (206, 211, 208), (942, 30), (1032, 75), 3)
+    pygame.draw.line(screen, WHITED, (851, 75), (942, 30), 3)
+    pygame.draw.line(screen, WHITED, (942, 30), (1032, 75), 3)
 
-    pygame.draw.line(screen, (206, 211, 208), (851, 88), (851, 75), 2)
-    pygame.draw.line(screen, (206, 211, 208), (1033, 88), (1033, 75), 2)
+    pygame.draw.line(screen, WHITED, (851, 88), (851, 75), 2)
+    pygame.draw.line(screen, WHITED, (1033, 88), (1033, 75), 2)
 
     zero_text = font.render('0', True, WHITE)
     zero_rect = zero_text.get_rect(center=(942, 67.5))
@@ -103,13 +169,13 @@ def draw_number_buttons():
     ubicaciones_tabla.append({'pos': (912, 47.5), 'rect': pygame.Rect(853, 32, 180, 56)})
 
     # Dibujar las casillas de apuesta
-    pygame.draw.line(screen, (206, 211, 208), (851, 88), (791, 88), 2)
-    pygame.draw.line(screen, (206, 211, 208), (851, 630), (791, 630), 2)
-    pygame.draw.line(screen, (206, 211, 208), (791, 88), (791, 630), 2)
+    pygame.draw.line(screen, WHITED, (851, 88), (791, 88), 2)
+    pygame.draw.line(screen, WHITED, (851, 630), (791, 630), 2)
+    pygame.draw.line(screen, WHITED, (791, 88), (791, 630), 2)
 
-    pygame.draw.line(screen, (206, 211, 208), (851, 223), (791, 223), 2)
-    pygame.draw.line(screen, (206, 211, 208), (851, 358), (791, 358), 2)
-    pygame.draw.line(screen, (206, 211, 208), (851, 493), (791, 493), 2)
+    pygame.draw.line(screen, WHITED, (851, 223), (791, 223), 2)
+    pygame.draw.line(screen, WHITED, (851, 358), (791, 358), 2)
+    pygame.draw.line(screen, WHITED, (851, 493), (791, 493), 2)
 
 
     zero_text = font.render('1 a 18', True, WHITE)
@@ -134,9 +200,26 @@ def draw_number_buttons():
     ubicaciones_tabla.append({'pos': (790, 543), 'rect': pygame.Rect(793, 495,  58, 135)})
 
 
+
+    pygame.draw.line(screen, WHITED, (851, 631), (851, 676), 2)
+    pygame.draw.line(screen, WHITED, (851, 676), (1034, 676), 2)
+    pygame.draw.line(screen, WHITED, (1033, 631), (1033, 676), 2)
+    pygame.draw.line(screen, WHITED, (941, 631), (941, 676), 2)
+
+    zero_text = font.render('Par', True, WHITE)
+    screen.blit(zero_text, zero_text.get_rect(center=(896, 656)))
+
+    zero_text = font.render('Impar', True, WHITE)
+    screen.blit(zero_text, zero_text.get_rect(center=(988, 656)))
+
+    ubicaciones_tabla.append({'pos': (865, 635), 'rect': pygame.Rect(853, 632,  88, 44)})
+    ubicaciones_tabla.append({'pos': (955, 635), 'rect': pygame.Rect(943, 632,  90, 44)})
+
+
 # Clase para representar una ficha
 class Ficha():
     def __init__(self, image, x, y):
+        self.image_name = image
         self.image = pygame.image.load(image)
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
@@ -237,6 +320,59 @@ def draw_roulette(roulette_rotation):
     pygame.draw.circle(screen, (71, 43, 30), (roulette_center_x, roulette_center_y), circle_radius, 2)
 
 
+
+def verificar_apuestas_y_calcular_ganancias(fichas, closest_number, result_color):
+    result_number = closest_number
+    result_color = obtener_color(result_number)
+
+    # Crear diccionarios para llevar un registro de las apuestas ganadoras y perdedoras
+    apuestas_resultados  = {
+        "ficha rojo carmesi.png": 0,
+        "ficha azul oscuro.png": 0,
+        "ficha purpura.png": 0,
+        "ficha azul.png": 0}
+
+    # Iterar a través de las fichas y verificar las apuestas
+    for ficha in fichas:
+        count = 0
+        if ficha.apuesta:
+            if result_number != 0 and ficha.rect.colliderect(ubicaciones_tabla[result_number-1]['rect']):
+                apuestas_resultados[ficha.image_name] += 35
+            elif (result_number == 0 and ficha.rect.colliderect(ubicaciones_tabla[36]['rect'])):
+                apuestas_resultados[ficha.image_name] += 35
+            else:
+                count += 1
+            if 0 < result_number < 19 and ficha.rect.colliderect(ubicaciones_tabla[37]['rect']):
+                apuestas_resultados[ficha.image_name] += 1
+            else:
+                count += 1
+            if result_color == "Rojo" and ficha.rect.colliderect(ubicaciones_tabla[38]['rect']):
+                apuestas_resultados[ficha.image_name] += 1
+            else:
+                count += 1
+            if result_color == "Negro" and ficha.rect.colliderect(ubicaciones_tabla[39]['rect']):
+                apuestas_resultados[ficha.image_name] += 1
+            else:
+                count += 1
+            if 18 < result_number < 37 and ficha.rect.colliderect(ubicaciones_tabla[40]['rect']):
+                apuestas_resultados[ficha.image_name] += 1
+            else:
+                count += 1
+            if (result_number != 0 and result_number % 2 == 0 and ficha.rect.colliderect(ubicaciones_tabla[41]['rect'])
+                or result_number % 2 != 0 and ficha.rect.colliderect(ubicaciones_tabla[42]['rect'])):
+                apuestas_resultados[ficha.image_name] += 1
+            else:
+                count += 1
+            if (count > 5):
+                apuestas_resultados[ficha.image_name] -= 1
+
+            ficha.apuesta = False
+
+    return apuestas_resultados
+
+
+
+
 # Función para obtener el color de un número
 def obtener_color(numero):
     if numero in number_color_map:
@@ -257,12 +393,10 @@ def main():
     spinning = False
     show_result = False
     
-    spin_time = random.randint(7500, 8500)  # Tiempo de giro en milisegundos (5 segundos)
     current_rotation = 0
 
     fichas = cargar_fichas(5, 5, 5, 5)
 
-    ball_radius = 15
     ball_center_x = roulette_center_x
     ball_center_y = roulette_center_y
     ball_angle = 0
@@ -270,24 +404,56 @@ def main():
     friction_coefficient = 0.98  # Coeficiente de fricción para la bola (ajustable)
 
     roulette_rotation = 0  # Inicializamos la rotación de la ruleta en 0
-    roulette_speed = 8  # Velocidad de rotación de la ruleta (ajustable)
+    roulette_speed = random.randint(8, 20)  # Velocidad de rotación de la ruleta (ajustable)
     roulette_friction_coefficient = 0.98  # Coeficiente de fricción para la ruleta (ajustable)
+
+    amount = show_start_layer()
 
     while running:
         # Dibuja la ruleta girando en sentido contrario a la bola
         draw_roulette( -roulette_rotation)
 
+        # Dibuja la tabla de efectivo actual
+        draw_money_table(fichas, amount)
+
         # Dibuja los botones de los números después de los otros elementos
         draw_number_buttons()
+
+
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 1:  # Botón izquierdo del mouse
 
-                    # Coordenadas del punto de clic
-                    click_x, click_y = event.pos
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                # Coordenadas del punto de clic
+                click_x, click_y = event.pos
+
+                if event.button == 3: # Boton derecho del mouse
+                    if not spinning:
+                        count = 0
+                        for i, ficha in enumerate(reversed(fichas)):
+                            if ficha.rect.collidepoint(event.pos):
+                                count += 1
+                                if ficha.apuesta == True:
+                                    seleccionada = False
+                                    for fich in fichas:
+                                        if fich.resaltada: seleccionada = True
+
+                                    if not seleccionada and count <= 4: 
+                                        ficha.apuesta = False
+                                    elif count > 4:
+                                        count = 0
+                                        break
+                                else:
+                                    # Cambia el estado de resaltado de la ficha
+                                    if count <= 4: 
+                                        ficha.resaltada = not ficha.resaltada
+                            else:
+                                ficha.resaltada = False
+                                    
+
+                if event.button == 1:  # Botón izquierdo del mouse
                     # Calcula la distancia desde el punto de clic al centro de la ruleta
                     distance = math.sqrt((click_x - roulette_center_x) ** 2 + (click_y - roulette_center_y) ** 2)
 
@@ -327,9 +493,8 @@ def main():
                         # Comienza a girar la ruleta
                         spinning = True
                         current_rotation = 0
-                        ball_speed = 10  # Calcula la velocidad necesaria para girar en 5 segundos
-                        roulette_speed = 8  # Restablece la velocidad de la ruleta
-                        spin_start_time = pygame.time.get_ticks()  # Registrar el tiempo de inicio del giro
+                        ball_speed = random.randint(9, 40)  # Calcula la velocidad necesaria para girar en 5 segundos
+                        roulette_speed = random.randint(8, 35)  # Restablece la velocidad de la ruleta
                         show_result = False
 
         for ficha in fichas:
@@ -345,7 +510,31 @@ def main():
                     screen.blit(ficha.image, ficha.rect)
                 else:
                     screen.blit(pygame.transform.scale(ficha.image, (40, 41)), ficha.rect)
-                
+
+        # Contar fichas no apostadas y crear textos
+        fichas_rojas_act = sum(1 for ficha in fichas if not ficha.apuesta and ficha.image_name == "ficha rojo carmesi.png")
+        fichas_rojas = sum(1 for ficha in fichas if ficha.image_name == "ficha rojo carmesi.png")
+
+        fichas_azules_oscuras_act = sum(1 for ficha in fichas if not ficha.apuesta and ficha.image_name == "ficha azul oscuro.png")
+        fichas_azules_oscuras = sum(1 for ficha in fichas if ficha.image_name == "ficha azul oscuro.png")
+
+        fichas_purpuras_act = sum(1 for ficha in fichas if not ficha.apuesta and ficha.image_name == "ficha purpura.png")
+        fichas_purpuras = sum(1 for ficha in fichas if ficha.image_name == "ficha purpura.png")
+
+        fichas_azules_act = sum(1 for ficha in fichas if not ficha.apuesta and ficha.image_name == "ficha azul.png")
+        fichas_azules = sum(1 for ficha in fichas if ficha.image_name == "ficha azul.png")
+
+
+        font = pygame.font.Font(None, 36)
+        texto_fichas_rojas = font.render(f'{fichas_rojas_act}/{fichas_rojas}', True, WHITED)
+        texto_fichas_azules_oscuras = font.render(f'{fichas_azules_oscuras_act}/{fichas_azules_oscuras}', True, WHITED)
+        texto_fichas_purpuras = font.render(f'{fichas_purpuras_act}/{fichas_purpuras}', True, WHITED)
+        texto_fichas_azules = font.render(f'{fichas_azules_act}/{fichas_azules}', True, WHITED)
+
+        screen.blit(texto_fichas_rojas, texto_fichas_rojas.get_rect(center=(1210, 165)))
+        screen.blit(texto_fichas_azules_oscuras, texto_fichas_azules_oscuras.get_rect(center=(1210, 305)))
+        screen.blit(texto_fichas_purpuras, texto_fichas_purpuras.get_rect(center=(1210, 430)))
+        screen.blit(texto_fichas_azules, texto_fichas_azules.get_rect(center=(1210, 565)))
  
         # Actualiza la rotación de la ruleta solo cuando está girando
         if spinning:
@@ -367,9 +556,7 @@ def main():
             if current_rotation >= 360:
                 current_rotation -= 360
 
-            if (
-                pygame.time.get_ticks() - spin_start_time > spin_time and ball_speed < 0.3
-            ):
+            if (ball_speed < 0.3):
                 show_result = True
                 spinning = False
                 ball_speed = 0  # Detener la esfera al instante al final del giro
@@ -418,15 +605,35 @@ def main():
         ball_y = ball_center_y + int(
             165 * math.sin(math.radians(ball_angle))
         )  # Aumentamos la separación a 250
-        pygame.draw.circle(screen, (215, 215, 210), (ball_x, ball_y), ball_radius)
-        pygame.draw.circle(screen, (228, 225, 220), (ball_x, ball_y), ball_radius - 2)
-        pygame.draw.circle(screen, (236, 231, 227), (ball_x, ball_y), ball_radius - 6)
+
+        pygame.draw.circle(screen, (215, 215, 210), (ball_x, ball_y), 15)
+        pygame.draw.circle(screen, (228, 225, 220), (ball_x, ball_y), 13)
+        pygame.draw.circle(screen, (236, 231, 227), (ball_x, ball_y), 9)
+
+
         if not spinning and show_result:
-                result_color = obtener_color(closest_number)
-                font = pygame.font.Font(None, 36)
-                text = font.render(f"Resultado: {closest_number} (Color : {result_color}) ", True, (0, 0, 0))
-                text_rect = text.get_rect(top= 30, left= 10)
-                screen.blit(text, text_rect)
+            result_color = obtener_color(closest_number)
+            apuestas_resultados = verificar_apuestas_y_calcular_ganancias(fichas, closest_number, result_color)
+            fichas_count = [0,0,0,0]
+                
+            for ficha in fichas:
+                if ficha.image_name == "ficha rojo carmesi.png":
+                    fichas_count[0] += 1
+                elif ficha.image_name == "ficha azul oscuro.png":
+                    fichas_count[1] += 1
+                elif ficha.image_name == "ficha purpura.png":
+                    fichas_count[2] += 1
+                else:
+                    fichas_count[3] += 1
+
+            fichas_count[0] += apuestas_resultados["ficha rojo carmesi.png"]
+            fichas_count[1] += apuestas_resultados["ficha azul oscuro.png"]
+            fichas_count[2] += apuestas_resultados["ficha purpura.png"]
+            fichas_count[3] += apuestas_resultados["ficha azul.png"]
+
+            fichas = cargar_fichas(fichas_count[0], fichas_count[1], fichas_count[2], fichas_count[3])
+            print(closest_number, result_color)
+            show_result = False
 
         pygame.display.flip()
 
