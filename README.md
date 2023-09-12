@@ -1,5 +1,7 @@
 # Ruleta de Casino en Python
 
+[![Download as PDF Button](https://img.shields.io/badge/Download%20AS%20pdf-EF3939?style=for-the-badge&logo=adobeacrobatreader&logoColor=white&color=black&labelColor=ec1c24)](https://mdtopdf.up.railway.app/convertPdf?url=https://raw.githubusercontent.com/programadorisgod/Ruleta-Espanola/main/README.md)
+
 Este proyecto es una simulación de una ruleta de casino en Python. Permite a los jugadores realizar apuestas en números y colores, y simula el giro de la ruleta para determinar los resultados.
 
 ## Requisitos
