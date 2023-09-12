@@ -42,10 +42,10 @@ pip install pygame
 
    ![267477097-7923a88d-5205-49b6-90aa-e7498b33feb9 (3)](https://github.com/programadorisgod/Ruleta-Espanola/assets/116904412/3b61768f-8869-4af6-b88b-a22a011bcb92)
 
-
 10. Igualmente se podran retirar las fichas del tablero de apuestas con `Click izquierdo` para una y `Click derecho` para 4, sobre las fichas que se quieran retirar:
 
-   ![image](https://github.com/programadorisgod/Ruleta-Espanola/assets/116904412/a4574367-3b13-4e21-98a0-39e2f7cddb13)
+   ![267477097-7923a88d-5205-49b6-90aa-e7498b33feb9](https://github.com/programadorisgod/Ruleta-Espanola/assets/116904412/3e5bb95a-2311-425d-a529-3db75af2de5f)
+
 
 11. Las apuestas disponibles son:
     - *Numero especifico*
