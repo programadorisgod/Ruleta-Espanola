@@ -6,7 +6,7 @@ Este proyecto es una simulación de una ruleta de casino en Python. Permite a lo
 
 ## Requisitos
 
-Para ejecutar este proyecto, necesitarás tener instaladas las siguientes bibliotecas de Python:
+Para ejecutar este proyecto, necesitarás tener instalado el interprete de `Python` que se encuentra disponible en `Microsoft Store` las siguientes bibliotecas de Python:
 
 - `pygame`: Biblioteca para crear juegos en 2D. Se utiliza para la interfaz gráfica.
 
